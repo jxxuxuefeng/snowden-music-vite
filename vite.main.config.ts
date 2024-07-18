@@ -12,18 +12,19 @@ export default defineConfig((env) => {
       lib: {
         entry: forgeConfigSelf.entry!,
         fileName: () => '[name].js',
-        formats: ['cjs'],
+        formats: ['cjs']
       },
       rollupOptions: {
-        external,
+        external
       },
+      outDir: '.vite/build/main'
     },
     plugins: [pluginHotRestart('restart')],
     define,
     resolve: {
       // Load the Node.js entry.
-      mainFields: ['module', 'jsnext:main', 'jsnext'],
-    },
+      mainFields: ['module', 'jsnext:main', 'jsnext']
+    }
   };
 
   return mergeConfig(getBuildConfig(forgeEnv), config);

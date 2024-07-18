@@ -18,11 +18,13 @@ export default defineConfig((env) => {
           inlineDynamicImports: true,
           entryFileNames: '[name].js',
           chunkFileNames: '[name].js',
-          assetFileNames: '[name].[ext]',
-        },
+          assetFileNames: '[name].[ext]'
+          // dir: '.vite/build/preload'
+        }
       },
+      outDir: '.vite/build/preload'
     },
-    plugins: [pluginHotRestart('reload')],
+    plugins: [pluginHotRestart('reload')]
   };
 
   return mergeConfig(getBuildConfig(forgeEnv), config);
