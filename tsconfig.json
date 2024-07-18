@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "module": "commonjs",
     "allowJs": true,
+    "module": "commonjs",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
@@ -11,13 +11,14 @@
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
     "paths": {
       "*": ["node_modules/*"],
       "@/*": ["src/renderer/src/*"],
       "@@/*": ["src/main/src/*"],
       "@shared/*": ["src/shared/*"],
       "@preload/*": ["src/preload/*"]
-    }
-  }
+    },
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*"]
 }

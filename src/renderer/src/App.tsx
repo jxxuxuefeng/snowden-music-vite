@@ -1,15 +1,114 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Layout from '@/layout';
+import { Progress } from '@/components/ui/progress';
+import { CirclePlay, MonitorUp, Upload, UploadIcon } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
+import { useStore } from '@/store';
 import { Button } from '@/components/ui/button';
+import { Toaster } from './components/ui/toaster';
+import { useToast } from '@/components/ui/use-toast';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const { toast } = useToast();
+  const setCurrentMusic = useStore((state) => state.setCurrentMusic);
+  const [musics, setMusics] = useState([]);
+  useEffect(() => {
+    const init = async () => {
+      const _musics = await window.context.getMusics();
+      setMusics(_musics);
+    };
+    init();
+  }, []);
+
+  const onImport = async () => {
+    try {
+      await window.context.importMusic();
+      const _musics = await window.context.getMusics();
+      setMusics(_musics);
+      toast({ description: '上传完成' });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
-    <div className="flex items-center">
-      <div className="text-3xl font-bold underline">Hello world!</div>
-      <div>{count}</div>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-      <Button>niubi</Button>
-    </div>
+    <Layout>
+      <div className="w-full">
+        <div className="m-2.5 text-sm font-medium mt-6">全部音乐</div>
+        <div className="text-xs flex items-center space-x-2 text-gray-500 m-2.5 mt-6">
+          <span>磁盘容量</span>
+          <Progress value={10} className="w-32 bg-gray-200" />
+          <span>1.5G/150G</span>
+        </div>
+        <div className="bg-[#cd4e3f] w-28 space-x-2 text-white text-sm h-7 flex items-center justify-center rounded-full m-2.5 mt-6">
+          <MonitorUp strokeWidth={1} size={18} />
+          <span className="cursor-pointer" onClick={onImport}>
+            上传音乐
+          </span>
+        </div>
+        <div>
+          <Table className="text-xs">
+            <TableHeader>
+              <TableHead></TableHead>
+              <TableHead>音乐标题</TableHead>
+              <TableHead>歌手</TableHead>
+              <TableHead>专辑</TableHead>
+              <TableHead>格式</TableHead>
+              <TableHead>大小</TableHead>
+              <TableHead>上传时间</TableHead>
+            </TableHeader>
+
+            <TableBody>
+              {musics?.length === 0 && (
+                <TableRow className="text-gray-500 text-center">
+                  <TableCell colSpan={7}>暂无数据</TableCell>
+                </TableRow>
+              )}
+              {musics.map((music, index) => {
+                console.log(music, 'music');
+                return (
+                  <TableRow
+                    onDoubleClick={async () => {
+                      try {
+                        const res = await window.context.playMusic(music.filePath);
+                        console.log(res, 'res');
+                        setCurrentMusic(res);
+                        console.log('click');
+                      } catch (error) {
+                        console.log(error, 'error');
+                        toast({
+                          title: '提示',
+                          description: error.message
+                        });
+                      }
+                    }}
+                    key={index}
+                    className="cursor-pointer"
+                    data-state={index === 0 ? 'selected' : ''}
+                  >
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{music.title}</TableCell>
+                    <TableCell>{music.artist}</TableCell>
+                    <TableCell>{music.album}</TableCell>
+                    <TableCell>{music.genre}</TableCell>
+                    <TableCell>{'-'}</TableCell>
+                    <TableCell>{music.uploadTime}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+      <Toaster />
+    </Layout>
   );
 }
 

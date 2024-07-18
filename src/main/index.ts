@@ -1,5 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
+import { getMusics, importMusic, playMusic } from './lib';
+import { GetMusics, PlayMusic } from '@shared/types';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -9,8 +11,10 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    height: 660,
+    width: 1000,
+    minWidth: 1000,
+    minHeight: 660,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js')
     }
@@ -23,6 +27,17 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; media-src 'self' blob:; img-src 'self' blob:;"
+        ]
+      }
+    });
+  });
+
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 };
@@ -30,7 +45,13 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createWindow();
+
+  ipcMain.handle('getMusics', (_, ...args: Parameters<GetMusics>) => getMusics(...args));
+  ipcMain.handle('playMusic', (_, ...args: Parameters<PlayMusic>) => playMusic(...args));
+  ipcMain.handle('importMusic', () => importMusic());
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
