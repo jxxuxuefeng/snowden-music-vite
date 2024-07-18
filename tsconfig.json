@@ -11,6 +11,13 @@
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "*": ["node_modules/*"],
+      "@/*": ["src/renderer/src/*"],
+      "@@/*": ["src/main/src/*"],
+      "@shared/*": ["src/shared/*"],
+      "@preload/*": ["src/preload/*"]
+    }
   }
 }
