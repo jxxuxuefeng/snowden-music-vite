@@ -1,126 +1,73 @@
-import { homedir } from 'os';
-import { databaseName, musicDirectoryName, musicFileExtensions } from '@shared/constants';
-import { readdir, readFile, copyFile } from 'fs-extra';
+import { musicDirectoryName, musicFileExtensions } from '@shared/constants';
 import { GetMusics } from '@shared/types';
-import { parseBuffer, parseFile } from 'music-metadata';
+import { formatTime } from '@shared/utils';
+import dayjs from 'dayjs';
+import { readdir, readFile, stat } from 'fs-extra';
+import { parseFile } from 'music-metadata';
 import * as path from 'node:path';
-import { getFileExtension } from 'roodash';
-import { dialog } from 'electron';
-import * as fs from 'node:fs';
-const databasePath = `${homedir()}/${databaseName}`;
+import { homedir } from 'os';
+import { generateUUID, getFileExtension } from 'roodash';
 
+// 获取音乐文件根目录
 export function getRootDir() {
-  console.log(homedir(), 'homedir');
   return `${homedir()}/${musicDirectoryName}`;
 }
 
+/**
+ * 解析音乐文件
+ * @param filteredFiles 过滤后的文件列表
+ * @param rootDir 音乐文件根目录
+ */
+async function processFiles(filteredFiles: string[], rootDir: string) {
+  const list = [];
+  for (const file of filteredFiles) {
+    const filePath = path.join(rootDir, file); // 获取文件的完整路径
+    const metadata = await parseFile(filePath); // 异步解析文件
+    const stats = await stat(filePath);
+    list.push({
+      title: metadata.common.title, // 歌曲名
+      artist: metadata.common.artist, // 歌手
+      album: metadata.common.album, //  专辑
+      genre: metadata.format.container, // 格式
+      duration: formatTime(metadata.format.duration), // 大小
+      uploadTime: dayjs(stats.ctime).format('YYYY-MM-DD'), // 创建时间
+      filePath: filePath, // 文件路径
+      id: generateUUID(),
+    });
+  }
+  return list;
+}
+
+/**
+ * 获取音乐列表
+ * @returns 音乐列表 Promise
+ */
 export const getMusics: GetMusics = async () => {
+  // 获取音乐文件根目录
   const rootDir = getRootDir();
-  console.log(rootDir, 'rootDir');
-  const files = await readFile(databasePath);
-  if (!files) return [];
-  const jsonString = files.toString('utf-8');
-  const jsonObject = JSON.parse(jsonString);
-  return jsonObject;
-  // const musics = files.filter((file) => {
-  //   // 后缀名符合 musicFileExtensions 都算是音乐文件
-  //   const ext = getFileExtension(file);
-  //   return musicFileExtensions.includes(ext);
-  // });
-  // console.log(musics, 'musics');
-  //
-  // return Promise.all(
-  //   musics.map(async (music) => {
-  //     return {
-  //       title: music.replace(/\.mp3$/, '')
-  //     };
-  //   })
-  // );
+  // 读取根目录下的所有文件
+  const files = await readdir(rootDir);
+  // 过滤出歌曲文件（假设歌曲文件扩展名为musicFileExtensions）
+  const filteredFiles = files.filter((file) => {
+    return musicFileExtensions.includes(getFileExtension(file));
+  });
+  // 解析文件
+  return processFiles(filteredFiles, rootDir).then((res) => {
+    return res;
+  });
 };
 
+/**
+ * 播放音乐
+ * @param filePath
+ */
 export const playMusic = async (filePath: string) => {
-  // const rootDir = getRootDir();
-  // const musicPath = `${rootDir}/${title}.mp3`;
   const fileBuffer = await readFile(filePath);
   const metadata = await parseFile(filePath);
   return {
     musicData: fileBuffer.toString('base64'),
     metadata,
     ext: path.extname(filePath).substring(1),
-    fileBuffer: fileBuffer
+    fileBuffer: fileBuffer,
   };
-};
-
-// 复制文件到目标目录
-async function copyFileToDirectory(filePath, targetDir) {
-  const fileName = path.basename(filePath);
-  const targetPath = path.join(targetDir, fileName);
-  await copyFile(filePath, targetPath);
-  return targetPath;
-}
-
-// 读取JSON数据库
-function readSongs() {
-  if (!fs.existsSync(databasePath)) {
-    return [];
-  }
-  const data = fs.readFileSync(databasePath);
-  return JSON.parse(data);
-}
-function ensureDirectoryExistence(filePath) {
-  const dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
-  ensureDirectoryExistence(dirname);
-  fs.mkdirSync(dirname);
-}
-// 写入JSON数据库
-function writeSongs(songs) {
-  ensureDirectoryExistence(databasePath);
-  fs.writeFileSync(databasePath, JSON.stringify(songs, null, 2));
-}
-
-// 添加歌曲到数据库
-function addSongToDatabase(song) {
-  const songs = readSongs();
-  song.id = songs.length ? songs[songs.length - 1].id + 1 : 1;
-  songs.push(song);
-  writeSongs(songs);
-}
-
-export const importMusic = async () => {
-  // 打开系统窗口选择音乐文件导入
-  const result = await dialog.showOpenDialog({
-    properties: ['openFile', 'multiSelections'],
-    filters: [{ name: 'Audio Files', extensions: musicFileExtensions }]
-  });
-
-  if (!result.canceled) {
-    const selectedFiles = result.filePaths;
-    const rootDir = getRootDir();
-    for (const filePath of selectedFiles) {
-      const targetPath = await copyFileToDirectory(filePath, rootDir);
-      // const fileBuffer = await readFile(filePath);
-      const metadata = await parseFile(filePath);
-      console.log(metadata, 'metadata');
-      const artist = metadata?.common?.artist || 'Unknown Artist';
-      const album = metadata?.common?.album || 'Unknown Album';
-      const genre = metadata?.format?.codec || 'Unknown Genre';
-      const duration = metadata?.format?.duration || 0;
-      const pic = metadata?.common?.picture?.[0]?.data;
-
-      const song = {
-        title: path.basename(filePath, path.extname(filePath)),
-        artist,
-        album,
-        genre,
-        duration,
-        pic,
-        filePath: targetPath,
-        uploadTime: '2024-7-17'
-      };
-      addSongToDatabase(song);
-    }
-  }
 };

@@ -1,9 +1,8 @@
+import { GetMusics, PlayMusic } from '@shared/types';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
-import { getMusics, importMusic, playMusic } from './lib';
-import { GetMusics, PlayMusic } from '@shared/types';
+import { getMusics, playMusic } from './lib';
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
@@ -16,27 +15,32 @@ const createWindow = () => {
     minWidth: 1000,
     minHeight: 660,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js')
-    }
+      contextIsolation: true,
+      preload: path.join(__dirname, '../preload/index.js'),
+    },
   });
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
   }
 
-  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Content-Security-Policy': [
-          "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; media-src 'self' blob:; img-src 'self' blob:;"
-        ]
-      }
-    });
-  });
+  mainWindow.webContents.session.webRequest.onHeadersReceived(
+    (details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          'Content-Security-Policy': [
+            "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; media-src 'self' blob:; img-src 'self' blob:;",
+          ],
+        },
+      });
+    },
+  );
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -48,9 +52,13 @@ const createWindow = () => {
 app.on('ready', () => {
   createWindow();
 
-  ipcMain.handle('getMusics', (_, ...args: Parameters<GetMusics>) => getMusics(...args));
-  ipcMain.handle('playMusic', (_, ...args: Parameters<PlayMusic>) => playMusic(...args));
-  ipcMain.handle('importMusic', () => importMusic());
+  ipcMain.handle('getMusics', (_, ...args: Parameters<GetMusics>) =>
+    getMusics(...args),
+  );
+  ipcMain.handle('playMusic', (_, ...args: Parameters<PlayMusic>) =>
+    playMusic(...args),
+  );
+  // ipcMain.handle('importMusic', () => importMusic());
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

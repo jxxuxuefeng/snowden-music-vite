@@ -1,35 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import Layout from '@/layout';
 import { Progress } from '@/components/ui/progress';
-import { CirclePlay, MonitorUp, Upload, UploadIcon } from 'lucide-react';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from '@/components/ui/table';
-import { useStore } from '@/store';
-import { Button } from '@/components/ui/button';
-import { Toaster } from './components/ui/toaster';
 import { useToast } from '@/components/ui/use-toast';
+import Layout from '@/layout';
+import { useStore } from '@/store';
+import { MonitorUp } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Toaster } from './components/ui/toaster';
 
 function App() {
   const { toast } = useToast();
   const setCurrentMusic = useStore((state) => state.setCurrentMusic);
+  const currentMusic = useStore((state) => state.currentMusic);
+  console.log(currentMusic, 'currentMusic');
   const [musics, setMusics] = useState([]);
   useEffect(() => {
     const init = async () => {
       const _musics = await window.context.getMusics();
+      console.log(_musics, '_musics');
       setMusics(_musics);
+      const res = await window.context.playMusic(_musics[0].filePath);
+      setCurrentMusic(res);
     };
     init();
   }, []);
 
   const onImport = async () => {
     try {
-      await window.context.importMusic();
+      // await window.context.importMusic();
       const _musics = await window.context.getMusics();
       setMusics(_musics);
       toast({ description: '上传完成' });
@@ -77,15 +81,15 @@ function App() {
                   <TableRow
                     onDoubleClick={async () => {
                       try {
-                        const res = await window.context.playMusic(music.filePath);
+                        const res = await window.context.playMusic(
+                          music.filePath,
+                        );
                         console.log(res, 'res');
                         setCurrentMusic(res);
-                        console.log('click');
                       } catch (error) {
-                        console.log(error, 'error');
                         toast({
                           title: '提示',
-                          description: error.message
+                          description: error.message,
                         });
                       }
                     }}
@@ -98,7 +102,7 @@ function App() {
                     <TableCell>{music.artist}</TableCell>
                     <TableCell>{music.album}</TableCell>
                     <TableCell>{music.genre}</TableCell>
-                    <TableCell>{'-'}</TableCell>
+                    <TableCell>{music.duration}</TableCell>
                     <TableCell>{music.uploadTime}</TableCell>
                   </TableRow>
                 );

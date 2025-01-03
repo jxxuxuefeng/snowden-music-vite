@@ -1,12 +1,24 @@
-import React, { ComponentProps, useEffect, useRef, useState } from 'react';
 import Nav from '@/components/Nav';
 import { Slider } from '@/components/ui/slider';
-import { CirclePause, CirclePlay, Heart, SkipBack, SkipForward } from 'lucide-react';
 import { useStore } from '@/store';
+import {
+  CirclePause,
+  CirclePlay,
+  Heart,
+  SkipBack,
+  SkipForward,
+} from 'lucide-react';
+import React, { ComponentProps, useEffect, useRef, useState } from 'react';
 
 function formatTime(time: number) {
-  const minutes = Math.floor(time / 60) < 10 ? `0${Math.floor(time / 60)}` : Math.floor(time / 60);
-  const seconds = Math.floor(time % 60) < 10 ? `0${Math.floor(time % 60)}` : Math.floor(time % 60);
+  const minutes =
+    Math.floor(time / 60) < 10
+      ? `0${Math.floor(time / 60)}`
+      : Math.floor(time / 60);
+  const seconds =
+    Math.floor(time % 60) < 10
+      ? `0${Math.floor(time % 60)}`
+      : Math.floor(time % 60);
   return `${minutes}:${seconds}`;
 }
 
@@ -16,7 +28,6 @@ function Index(props: ComponentProps<'div'>) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [imgURL, setImgURL] = useState(null);
-
   const [currentTime, setCurrentTime] = useState(0);
 
   function togglePlayPause() {
@@ -69,10 +80,6 @@ function Index(props: ComponentProps<'div'>) {
 
   const progress = (currentTime / metadata?.format?.duration) * 100 || 0;
 
-  // console.log(metadata, 'metadata');
-  //
-  // console.log(imgURL, 'imgURL');
-
   const setCurrentTimeRef = (time) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
@@ -98,8 +105,6 @@ function Index(props: ComponentProps<'div'>) {
             const _v = (metadata?.format?.duration * newValue) / 100;
             setCurrentTime(_v);
             setCurrentTimeRef(_v);
-            // @ts-ignore
-            // audioRef?.current?.currentTime = _v;
           }}
         />
 
@@ -114,7 +119,8 @@ function Index(props: ComponentProps<'div'>) {
               </div>
             </div>
             <div className="text-xs pl-2 text-gray-400">
-              {formatTime(currentTime)} / {formatTime(metadata?.format?.duration)}
+              {formatTime(currentTime)} /{' '}
+              {formatTime(metadata?.format?.duration)}
             </div>
           </div>
           <audio controls ref={audioRef} className="hidden" />
@@ -123,7 +129,11 @@ function Index(props: ComponentProps<'div'>) {
               <Heart className="w-4 text-gray-500 mr-8" />
             </div>
             <div className="flex items-center space-x-4">
-              <SkipBack color="#c3473a" strokeWidth={1} className="cursor-pointer" />
+              <SkipBack
+                color="#c3473a"
+                strokeWidth={1}
+                className="cursor-pointer"
+              />
               {isPlaying ? (
                 <CirclePause
                   color="#c33737"
@@ -141,7 +151,11 @@ function Index(props: ComponentProps<'div'>) {
                   className="cursor-pointer"
                 />
               )}
-              <SkipForward color="#c3473a" strokeWidth={1} className="cursor-pointer" />
+              <SkipForward
+                color="#c3473a"
+                strokeWidth={1}
+                className="cursor-pointer"
+              />
             </div>
           </div>
         </div>
