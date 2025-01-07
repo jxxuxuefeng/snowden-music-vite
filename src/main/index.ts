@@ -1,7 +1,7 @@
 import { GetMusics, PlayMusic } from '@shared/types';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
-import { getMusics, playMusic } from './lib';
+import { getMusics, importMusic, playMusic } from './lib';
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -58,7 +58,9 @@ app.on('ready', () => {
   ipcMain.handle('playMusic', (_, ...args: Parameters<PlayMusic>) =>
     playMusic(...args),
   );
-  // ipcMain.handle('importMusic', () => importMusic());
+  ipcMain.handle('importMusic', (_, ...args: Parameters<PlayMusic>) =>
+    importMusic(...args),
+  );
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

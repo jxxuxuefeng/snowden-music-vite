@@ -33,7 +33,7 @@ function App() {
 
   const onImport = async () => {
     try {
-      // await window.context.importMusic();
+      await window.context.importMusic();
       const _musics = await window.context.getMusics();
       setMusics(_musics);
       toast({ description: '上传完成' });
@@ -52,7 +52,7 @@ function App() {
           <span>1.5G/150G</span>
         </div>
         <div className="bg-[#cd4e3f] w-28 space-x-2 text-white text-sm h-7 flex items-center justify-center rounded-full m-2.5 mt-6">
-          <MonitorUp strokeWidth={1} size={18} />
+          <MonitorUp strokeWidth={0} size={18} />
           <span className="cursor-pointer" onClick={onImport}>
             上传音乐
           </span>

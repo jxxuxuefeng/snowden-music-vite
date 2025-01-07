@@ -5,7 +5,7 @@ declare global {
     context: {
       getMusics: GetMusics;
       playMusic: PlayMusic;
-      importMusic: () => void;
+      importMusic: () => Promise<void>;
     };
   }
 }
