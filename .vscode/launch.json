@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "调试主进程和渲染进程",
+      "configurations": ["调试主进程", "调试渲染进程"],
+      "stopAll": true
+    }
+  ],
+  "configurations": [
+    {
+      "name": "调试主进程",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "args": ["."],
+      "outputCapture": "std",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "调试渲染进程",
+      "type": "chrome",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "runtimeArgs": ["${workspaceRoot}", "--remote-debugging-port=9222"],
+      "webRoot": "${workspaceRoot}/src/renderer"
+    }
+  ]
+}

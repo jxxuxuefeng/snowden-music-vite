@@ -25,6 +25,11 @@ try {
      * 导入音乐
      */
     importMusic: () => ipcRenderer.invoke('importMusic'),
+    /**
+     * 删除音乐
+     * @param id
+     */
+    deleteMusic: (id: string) => ipcRenderer.invoke('deleteMusic', id),
   });
 } catch (error) {
   console.error(error);

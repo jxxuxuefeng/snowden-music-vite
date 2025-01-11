@@ -10,8 +10,9 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import Layout from '@/layout';
 import { useStore } from '@/store';
+import { MusicInfo } from '@shared/models';
 import { MonitorUp } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Toaster } from './components/ui/toaster';
 
 function App() {
@@ -19,7 +20,8 @@ function App() {
   const setCurrentMusic = useStore((state) => state.setCurrentMusic);
   const currentMusic = useStore((state) => state.currentMusic);
   console.log(currentMusic, 'currentMusic');
-  const [musics, setMusics] = useState([]);
+  const [musics, setMusics] = useState<MusicInfo[]>([]);
+
   useEffect(() => {
     const init = async () => {
       const _musics = await window.context.getMusics();
@@ -42,6 +44,12 @@ function App() {
     }
   };
 
+  // const onDelete = async (id: string) => {
+  //   await window.context.deleteMusic(id);
+  //   const _musics = await window.context.getMusics();
+  //   setMusics(_musics);
+  // };
+
   return (
     <Layout>
       <div className="w-full">
@@ -57,6 +65,15 @@ function App() {
             上传音乐
           </span>
         </div>
+        {/* <div className="bg-[#cd4e3f] w-28 space-x-2 text-white text-sm h-7 flex items-center justify-center rounded-full m-2.5 mt-6">
+          <Trash2 strokeWidth={0} size={18} />
+          <span
+            className="cursor-pointer"
+            onClick={() => onDelete('768e6e8c-f4f9-440d-84c6-d1a9677b04ba')}
+          >
+            删除音乐
+          </span>
+        </div> */}
         <div>
           <Table className="text-xs">
             <TableHeader>

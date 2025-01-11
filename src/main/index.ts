@@ -1,7 +1,7 @@
-import { GetMusics, PlayMusic } from '@shared/types';
+import { DeleteMusic, GetMusics, PlayMusic } from '@shared/types';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
-import { getMusics, importMusic, playMusic } from './lib';
+import { deleteMusic, getMusics, importMusic, playMusic } from './lib';
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -60,6 +60,9 @@ app.on('ready', () => {
   );
   ipcMain.handle('importMusic', (_, ...args: Parameters<PlayMusic>) =>
     importMusic(...args),
+  );
+  ipcMain.handle('deleteMusic', (_, ...args: Parameters<DeleteMusic>) =>
+    deleteMusic(...args),
   );
 });
 

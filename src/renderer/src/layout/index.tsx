@@ -115,7 +115,7 @@ function Index(props: ComponentProps<'div'>) {
           <div>
             <div className="text-xs text-gray-500 pl-2">
               <div className="text-sm text-gray-600 truncate w-40">
-                {metadata?.common?.album} -{metadata?.common?.artist}
+                {metadata?.common?.title} -{metadata?.common?.artist}
               </div>
             </div>
             <div className="text-xs pl-2 text-gray-400">

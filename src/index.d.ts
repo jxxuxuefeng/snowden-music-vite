@@ -6,6 +6,7 @@ declare global {
       getMusics: GetMusics;
       playMusic: PlayMusic;
       importMusic: () => Promise<void>;
+      deleteMusic: (id: string) => Promise<void>;
     };
   }
 }
