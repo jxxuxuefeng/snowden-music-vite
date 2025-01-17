@@ -16,10 +16,9 @@ if (!existsSync(dbDir)) {
 
 const db = new Database(dbPath);
 
-// 初始化数据库表
+// 初始化数据库表，仅当表不存在时创建
 db.exec(`
-  DROP TABLE IF EXISTS musics;
-  CREATE TABLE musics (
+  CREATE TABLE IF NOT EXISTS musics (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     artist TEXT,

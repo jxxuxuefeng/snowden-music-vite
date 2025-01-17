@@ -1,4 +1,4 @@
-import { DeleteMusic, GetMusics, PlayMusic } from '@shared/types';
+import { DeleteMusic, GetMusics, ImportMusic, PlayMusic } from '@shared/types';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { deleteMusic, getMusics, importMusic, playMusic } from './lib';
@@ -58,7 +58,7 @@ app.on('ready', () => {
   ipcMain.handle('playMusic', (_, ...args: Parameters<PlayMusic>) =>
     playMusic(...args),
   );
-  ipcMain.handle('importMusic', (_, ...args: Parameters<PlayMusic>) =>
+  ipcMain.handle('importMusic', (_, ...args: Parameters<ImportMusic>) =>
     importMusic(...args),
   );
   ipcMain.handle('deleteMusic', (_, ...args: Parameters<DeleteMusic>) =>

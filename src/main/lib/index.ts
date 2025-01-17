@@ -1,8 +1,9 @@
 import { musicDirectoryName, musicFileExtensions } from '@shared/constants';
-import { MusicInfo } from '@shared/models';
+import { MusicData, MusicInfo } from '@shared/models';
 import { GetMusics } from '@shared/types';
 import { dialog } from 'electron';
-import { copyFile, readdir, readFile, stat, unlink } from 'fs-extra';
+import { existsSync } from 'fs';
+import { copyFile, readdir, readFile, unlink } from 'fs-extra';
 import { parseFile } from 'music-metadata';
 import * as path from 'node:path';
 import { homedir } from 'os';
@@ -56,17 +57,37 @@ export const getMusics: GetMusics = async () => {
 
 /**
  * 播放音乐
- * @param filePath
+ * @param filePath 音乐文件路径
  */
-export const playMusic = async (filePath: string) => {
-  const fileBuffer = await readFile(filePath);
-  const metadata = await parseFile(filePath);
-  return {
-    musicData: fileBuffer.toString('base64'),
-    metadata,
-    ext: path.extname(filePath).substring(1),
-    fileBuffer: fileBuffer,
-  };
+export const playMusic = async (filePath: string): Promise<MusicData> => {
+  try {
+    // 检查文件是否存在
+    if (!existsSync(filePath)) {
+      throw new Error('音乐文件不存在');
+    }
+
+    // 检查文件类型
+    const ext = path.extname(filePath).toLowerCase().substring(1);
+    if (!musicFileExtensions.includes(ext)) {
+      throw new Error('不支持的音乐文件格式');
+    }
+
+    // 读取文件和元数据
+    const [fileBuffer, metadata] = await Promise.all([
+      readFile(filePath),
+      parseFile(filePath),
+    ]);
+
+    return {
+      // musicData: fileBuffer.toString('base64'),
+      metadata,
+      ext,
+      fileBuffer,
+    };
+  } catch (error) {
+    console.error('播放音乐失败:', error);
+    throw new Error('播放音乐失败');
+  }
 };
 
 /**

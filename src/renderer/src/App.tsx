@@ -28,6 +28,9 @@ function App() {
     const init = async () => {
       const _musics = await window.context.getMusics();
       console.log(_musics, '_musics');
+      if (_musics.length === 0) {
+        return;
+      }
       setMusics(_musics);
       const res = await window.context.playMusic(_musics[0].filePath);
       setCurrentMusic(res);

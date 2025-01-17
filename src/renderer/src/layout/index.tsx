@@ -1,6 +1,7 @@
 import Nav from '@/components/Nav';
 import { Slider } from '@/components/ui/slider';
 import { useStore } from '@/store';
+import { formatTime } from '@/utils';
 import {
   CirclePause,
   CirclePlay,
@@ -8,28 +9,24 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react';
-import React, { ComponentProps, useEffect, useRef, useState } from 'react';
-
-function formatTime(time: number) {
-  const minutes =
-    Math.floor(time / 60) < 10
-      ? `0${Math.floor(time / 60)}`
-      : Math.floor(time / 60);
-  const seconds =
-    Math.floor(time % 60) < 10
-      ? `0${Math.floor(time % 60)}`
-      : Math.floor(time % 60);
-  return `${minutes}:${seconds}`;
-}
+import { IAudioMetadata } from 'music-metadata';
+import { ComponentProps, useEffect, useRef, useState } from 'react';
 
 function Index(props: ComponentProps<'div'>) {
+  // 当前播放的音乐
   const currentMusic = useStore((state) => state.currentMusic);
-  const [metadata, setMetadatao] = useState({});
-  const audioRef = useRef(null);
+  // 音乐元数据
+  const [metadata, setMetadata] = useState<IAudioMetadata | null>(null);
+  // 音频元素
+  const audioRef = useRef<HTMLAudioElement>(null);
+  // 是否正在播放
   const [isPlaying, setIsPlaying] = useState(false);
+  // 专辑封面
   const [imgURL, setImgURL] = useState(null);
+  // 当前播放时间
   const [currentTime, setCurrentTime] = useState(0);
 
+  // 播放/暂停
   function togglePlayPause() {
     if (isPlaying) {
       audioRef.current.pause();
@@ -39,15 +36,15 @@ function Index(props: ComponentProps<'div'>) {
     setIsPlaying(!isPlaying);
   }
 
+  // 初始化
   useEffect(() => {
     const init = async () => {
+      // 没有音乐，直接返回
       if (!currentMusic) return;
-      const res = currentMusic;
-      console.log(res, 'res');
-      const blob = new Blob([res.fileBuffer]);
+      const blob = new Blob([currentMusic.fileBuffer]);
       const audioURL = URL.createObjectURL(blob);
 
-      const pic = res?.metadata?.common?.picture?.[0];
+      const pic = currentMusic.metadata.common.picture[0];
       if (pic) {
         const imgBlob = new Blob([pic.data]);
         const imgUrl = URL.createObjectURL(imgBlob);
@@ -58,16 +55,15 @@ function Index(props: ComponentProps<'div'>) {
       audioRef.current.src = audioURL;
       audioRef.current.play();
       setIsPlaying(true);
-      setMetadatao(res.metadata);
+      setMetadata(currentMusic.metadata);
     };
     init();
   }, [currentMusic]);
 
+  // 监听音频播放时间
   useEffect(() => {
     const audio = audioRef.current;
-    // console.log(audio, 'audi00o');
     audio.addEventListener('timeupdate', () => {
-      // console.log(audioRef.current.currentTime, 'audioRef.current.currentTime');
       setCurrentTime(audioRef.current.currentTime);
     });
 
@@ -80,7 +76,7 @@ function Index(props: ComponentProps<'div'>) {
 
   const progress = (currentTime / metadata?.format?.duration) * 100 || 0;
 
-  const setCurrentTimeRef = (time) => {
+  const setCurrentTimeRef = (time: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
     }
@@ -101,8 +97,7 @@ function Index(props: ComponentProps<'div'>) {
           step={1}
           className="bg-blue-500"
           onValueChange={(newValue) => {
-            console.log('onDragStart', newValue);
-            const _v = (metadata?.format?.duration * newValue) / 100;
+            const _v = ((metadata?.format?.duration || 0) * newValue[0]) / 100;
             setCurrentTime(_v);
             setCurrentTimeRef(_v);
           }}

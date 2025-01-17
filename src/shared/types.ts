@@ -1,9 +1,21 @@
-import { MusicInfo } from '@shared/models';
+import { MusicData, MusicInfo } from '@shared/models';
 
+/**
+ * 获取音乐列表
+ */
 export type GetMusics = () => Promise<MusicInfo[]>;
 
-export type PlayMusic = (title: string) => Promise<MusicInfo>;
+/**
+ * 播放音乐
+ */
+export type PlayMusic = (filePath: string) => Promise<MusicData>;
 
-export type ImportMusic = () => Promise<void>;
+/**
+ * 导入音乐
+ */
+export type ImportMusic = () => Promise<MusicInfo[]>;
 
-export type DeleteMusic = (id: string) => Promise<void>;
+/**
+ * 删除音乐
+ */
+export type DeleteMusic = (filePath: string) => Promise<void>;

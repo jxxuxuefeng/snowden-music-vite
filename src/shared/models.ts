@@ -1,3 +1,8 @@
+import { IAudioMetadata } from 'music-metadata';
+
+/**
+ * 音乐信息
+ */
 export type MusicInfo = {
   /**
    * 唯一标识
@@ -31,4 +36,22 @@ export type MusicInfo = {
    * 文件路径
    */
   filePath: string;
+};
+
+/**
+ * 音乐数据
+ */
+export type MusicData = {
+  /**
+   * 元数据
+   */
+  metadata: IAudioMetadata;
+  /**
+   * 文件扩展名
+   */
+  ext: string;
+  /**
+   * 文件缓冲区
+   */
+  fileBuffer: Buffer;
 };
