@@ -51,7 +51,7 @@ function Index(props: ComponentProps<'div'>) {
       const blob = new Blob([currentMusic.fileBuffer]);
       const audioURL = URL.createObjectURL(blob);
 
-      const pic = currentMusic.metadata.common.picture[0];
+      const pic = currentMusic.metadata.common.picture?.[0];
       if (pic) {
         const imgBlob = new Blob([pic.data]);
         const imgUrl = URL.createObjectURL(imgBlob);

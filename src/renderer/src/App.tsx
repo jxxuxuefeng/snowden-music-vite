@@ -46,7 +46,10 @@ function App() {
 
   const onImport = async () => {
     try {
-      await window.context.importMusic();
+      const res = await window.context.importMusic();
+      if (res.length === 0) {
+        return;
+      }
       const _musics = await window.context.getMusics();
       setMusics(_musics);
       toast({ description: '上传完成' });
