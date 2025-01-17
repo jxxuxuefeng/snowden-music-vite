@@ -67,19 +67,28 @@ function Index(props: ComponentProps<'div'>) {
     init();
   }, [currentMusic]);
 
-  // 监听音频播放时间
+  // 监听音频播放时间和结束事件
   useEffect(() => {
     const audio = audioRef.current;
-    audio.addEventListener('timeupdate', () => {
-      setCurrentTime(audioRef.current.currentTime);
-    });
+    if (!audio) return;
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+
+    // 处理音频播放结束
+    const handleEnded = () => {
+      playPrevOrNext(true); // 播放下一首
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
 
     return () => {
-      audio.removeEventListener('timeupdate', () => {
-        setCurrentTime(audioRef.current.currentTime);
-      });
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, [audioRef]);
+  }, [audioRef.current, currentMusic]); // 添加 currentMusic 作为依赖
 
   const progress = (currentTime / metadata?.format?.duration) * 100 || 0;
 
