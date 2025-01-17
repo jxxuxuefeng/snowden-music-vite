@@ -13,8 +13,15 @@ import { IAudioMetadata } from 'music-metadata';
 import { ComponentProps, useEffect, useRef, useState } from 'react';
 
 function Index(props: ComponentProps<'div'>) {
-  // 当前播放的音乐
-  const currentMusic = useStore((state) => state.currentMusic);
+  // 使用解构方式从useStore中提取所需的状态和方法
+  const { currentMusic, musics, setCurrentMusic, setCurrentIndex } = useStore(
+    (state) => ({
+      currentMusic: state.currentMusic,
+      musics: state.musics,
+      setCurrentMusic: state.setCurrentMusic,
+      setCurrentIndex: state.setCurrentIndex,
+    }),
+  );
   // 音乐元数据
   const [metadata, setMetadata] = useState<IAudioMetadata | null>(null);
   // 音频元素
@@ -82,6 +89,22 @@ function Index(props: ComponentProps<'div'>) {
     }
   };
 
+  // 播放上一首或者下一首
+  const playPrevOrNext = async (isNext: boolean) => {
+    if (!currentMusic || !musics.length) return;
+    const currentIndex = musics.findIndex((m) => m.id === currentMusic.id);
+    const nextIndex = isNext
+      ? (currentIndex + 1) % musics.length
+      : (currentIndex - 1 + musics.length) % musics.length; // 循环播放
+    const nextMusic = musics[nextIndex];
+    const res = await window.context.playMusic(
+      nextMusic.id,
+      nextMusic.filePath,
+    );
+    setCurrentMusic(res);
+    setCurrentIndex(nextIndex);
+  };
+
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <div className="flex flex-auto">
@@ -128,6 +151,7 @@ function Index(props: ComponentProps<'div'>) {
                 color="#c3473a"
                 strokeWidth={1}
                 className="cursor-pointer"
+                onClick={() => playPrevOrNext(false)}
               />
               {isPlaying ? (
                 <CirclePause
@@ -150,6 +174,7 @@ function Index(props: ComponentProps<'div'>) {
                 color="#c3473a"
                 strokeWidth={1}
                 className="cursor-pointer"
+                onClick={() => playPrevOrNext(true)}
               />
             </div>
           </div>

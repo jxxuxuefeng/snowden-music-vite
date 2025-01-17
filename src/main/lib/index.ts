@@ -57,9 +57,13 @@ export const getMusics: GetMusics = async () => {
 
 /**
  * 播放音乐
+ * @param id 音乐ID
  * @param filePath 音乐文件路径
  */
-export const playMusic = async (filePath: string): Promise<MusicData> => {
+export const playMusic = async (
+  id: string,
+  filePath: string,
+): Promise<MusicData> => {
   try {
     // 检查文件是否存在
     if (!existsSync(filePath)) {
@@ -79,6 +83,7 @@ export const playMusic = async (filePath: string): Promise<MusicData> => {
     ]);
 
     return {
+      id,
       // musicData: fileBuffer.toString('base64'),
       metadata,
       ext,

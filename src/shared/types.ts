@@ -8,7 +8,7 @@ export type GetMusics = () => Promise<MusicInfo[]>;
 /**
  * 播放音乐
  */
-export type PlayMusic = (filePath: string) => Promise<MusicData>;
+export type PlayMusic = (id: string, filePath: string) => Promise<MusicData>;
 
 /**
  * 导入音乐

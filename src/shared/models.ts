@@ -43,6 +43,10 @@ export type MusicInfo = {
  */
 export type MusicData = {
   /**
+   * 唯一标识
+   */
+  id: string;
+  /**
    * 元数据
    */
   metadata: IAudioMetadata;

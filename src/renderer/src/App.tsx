@@ -11,18 +11,21 @@ import { useToast } from '@/components/ui/use-toast';
 import Layout from '@/layout';
 import { useStore } from '@/store';
 import { formatTime } from '@/utils';
-import { MusicInfo } from '@shared/models';
 import dayjs from 'dayjs';
 import { MonitorUp } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Toaster } from './components/ui/toaster';
 
 function App() {
   const { toast } = useToast();
-  const setCurrentMusic = useStore((state) => state.setCurrentMusic);
-  const currentMusic = useStore((state) => state.currentMusic);
-  console.log(currentMusic, 'currentMusic');
-  const [musics, setMusics] = useState<MusicInfo[]>([]);
+  const { setCurrentMusic, musics, setMusics, currentIndex, setCurrentIndex } =
+    useStore((state) => ({
+      setCurrentMusic: state.setCurrentMusic,
+      musics: state.musics,
+      setMusics: state.setMusics,
+      currentIndex: state.currentIndex,
+      setCurrentIndex: state.setCurrentIndex,
+    }));
 
   useEffect(() => {
     const init = async () => {
@@ -32,7 +35,10 @@ function App() {
         return;
       }
       setMusics(_musics);
-      const res = await window.context.playMusic(_musics[0].filePath);
+      const res = await window.context.playMusic(
+        _musics[0].id,
+        _musics[0].filePath,
+      );
       setCurrentMusic(res);
     };
     init();
@@ -104,10 +110,11 @@ function App() {
                     onDoubleClick={async () => {
                       try {
                         const res = await window.context.playMusic(
+                          music.id,
                           music.filePath,
                         );
-                        console.log(res, 'res');
                         setCurrentMusic(res);
+                        setCurrentIndex(index);
                       } catch (error) {
                         toast({
                           title: '提示',
@@ -117,7 +124,7 @@ function App() {
                     }}
                     key={index}
                     className="cursor-pointer"
-                    data-state={index === 0 ? 'selected' : ''}
+                    data-state={index === currentIndex ? 'selected' : ''}
                   >
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{music.title}</TableCell>
