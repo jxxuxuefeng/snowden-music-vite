@@ -66,9 +66,9 @@ function App() {
 
   return (
     <Layout>
-      <div className="w-full">
-        <div className="m-2.5 text-sm font-medium mt-6">全部音乐</div>
-        <div className="text-xs flex items-center space-x-2 text-gray-500 m-2.5 mt-6">
+      <div className="w-full h-full flex flex-col">
+        <div className="p-2.5 text-sm font-medium">全部音乐</div>
+        <div className="text-xs flex items-center space-x-2 text-gray-500 p-2.5 pt-6">
           <span>磁盘容量</span>
           <Progress value={10} className="w-32 bg-gray-200" />
           <span>1.5G/150G</span>
@@ -79,71 +79,60 @@ function App() {
             上传音乐
           </span>
         </div>
-        {/* <div className="bg-[#cd4e3f] w-28 space-x-2 text-white text-sm h-7 flex items-center justify-center rounded-full m-2.5 mt-6">
-          <Trash2 strokeWidth={0} size={18} />
-          <span
-            className="cursor-pointer"
-            onClick={() => onDelete('768e6e8c-f4f9-440d-84c6-d1a9677b04ba')}
-          >
-            删除音乐
-          </span>
-        </div> */}
-        <div>
-          <Table className="text-xs">
-            <TableHeader>
-              <TableHead></TableHead>
-              <TableHead>音乐标题</TableHead>
-              <TableHead>歌手</TableHead>
-              <TableHead>专辑</TableHead>
-              <TableHead>格式</TableHead>
-              <TableHead>大小</TableHead>
-              <TableHead>上传时间</TableHead>
-            </TableHeader>
+        <Table className="text-xs">
+          <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
+            <TableHead></TableHead>
+            <TableHead>音乐标题</TableHead>
+            <TableHead>歌手</TableHead>
+            <TableHead>专辑</TableHead>
+            <TableHead>格式</TableHead>
+            <TableHead>大小</TableHead>
+            <TableHead>上传时间</TableHead>
+          </TableHeader>
 
-            <TableBody>
-              {musics?.length === 0 && (
-                <TableRow className="text-gray-500 text-center">
-                  <TableCell colSpan={7}>暂无数据</TableCell>
+          <TableBody>
+            {musics?.length === 0 && (
+              <TableRow className="text-gray-500 text-center">
+                <TableCell colSpan={7}>暂无数据</TableCell>
+              </TableRow>
+            )}
+            {musics.map((music, index) => {
+              console.log(music, 'music');
+              return (
+                <TableRow
+                  onDoubleClick={async () => {
+                    try {
+                      const res = await window.context.playMusic(
+                        music.id,
+                        music.filePath,
+                      );
+                      setCurrentMusic(res);
+                      setCurrentIndex(index);
+                    } catch (error) {
+                      toast({
+                        title: '提示',
+                        description: error.message,
+                      });
+                    }
+                  }}
+                  key={index}
+                  className="cursor-pointer"
+                  data-state={index === currentIndex ? 'selected' : ''}
+                >
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{music.title}</TableCell>
+                  <TableCell>{music.artist}</TableCell>
+                  <TableCell>{music.album}</TableCell>
+                  <TableCell>{music.genre}</TableCell>
+                  <TableCell>{formatTime(music.duration)}</TableCell>
+                  <TableCell>
+                    {dayjs(music.uploadTime).format('YYYY-MM-DD')}
+                  </TableCell>
                 </TableRow>
-              )}
-              {musics.map((music, index) => {
-                console.log(music, 'music');
-                return (
-                  <TableRow
-                    onDoubleClick={async () => {
-                      try {
-                        const res = await window.context.playMusic(
-                          music.id,
-                          music.filePath,
-                        );
-                        setCurrentMusic(res);
-                        setCurrentIndex(index);
-                      } catch (error) {
-                        toast({
-                          title: '提示',
-                          description: error.message,
-                        });
-                      }
-                    }}
-                    key={index}
-                    className="cursor-pointer"
-                    data-state={index === currentIndex ? 'selected' : ''}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{music.title}</TableCell>
-                    <TableCell>{music.artist}</TableCell>
-                    <TableCell>{music.album}</TableCell>
-                    <TableCell>{music.genre}</TableCell>
-                    <TableCell>{formatTime(music.duration)}</TableCell>
-                    <TableCell>
-                      {dayjs(music.uploadTime).format('YYYY-MM-DD')}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+              );
+            })}
+          </TableBody>
+        </Table>
       </div>
       <Toaster />
     </Layout>

@@ -116,11 +116,11 @@ function Index(props: ComponentProps<'div'>) {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <div className="flex flex-auto">
+      <div className="flex flex-auto overflow-hidden">
         <div className="w-52 bg-[#ededed]">
           <Nav />
         </div>
-        <div className="w-full">{props.children}</div>
+        <div className="flex-auto h-full">{props.children}</div>
       </div>
       <div className="h-14">
         <Slider
