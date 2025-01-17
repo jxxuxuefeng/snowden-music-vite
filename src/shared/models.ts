@@ -1,5 +1,9 @@
 export type MusicInfo = {
   /**
+   * 唯一标识
+   */
+  id: string;
+  /**
    * 标题
    */
   title: string;
@@ -18,11 +22,11 @@ export type MusicInfo = {
   /**
    * 大小
    */
-  duration: string;
+  duration: number;
   /**
    * 上传时间
    */
-  uploadTime: string;
+  uploadTime: number;
   /**
    * 文件路径
    */

@@ -10,7 +10,9 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import Layout from '@/layout';
 import { useStore } from '@/store';
+import { formatTime } from '@/utils';
 import { MusicInfo } from '@shared/models';
+import dayjs from 'dayjs';
 import { MonitorUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Toaster } from './components/ui/toaster';
@@ -40,7 +42,7 @@ function App() {
       setMusics(_musics);
       toast({ description: '上传完成' });
     } catch (err) {
-      console.log(err);
+      toast({ description: err.message });
     }
   };
 
@@ -119,8 +121,10 @@ function App() {
                     <TableCell>{music.artist}</TableCell>
                     <TableCell>{music.album}</TableCell>
                     <TableCell>{music.genre}</TableCell>
-                    <TableCell>{music.duration}</TableCell>
-                    <TableCell>{music.uploadTime}</TableCell>
+                    <TableCell>{formatTime(music.duration)}</TableCell>
+                    <TableCell>
+                      {dayjs(music.uploadTime).format('YYYY-MM-DD')}
+                    </TableCell>
                   </TableRow>
                 );
               })}

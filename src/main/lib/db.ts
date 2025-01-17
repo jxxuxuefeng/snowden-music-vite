@@ -18,14 +18,15 @@ const db = new Database(dbPath);
 
 // 初始化数据库表
 db.exec(`
-  CREATE TABLE IF NOT EXISTS musics (
+  DROP TABLE IF EXISTS musics;
+  CREATE TABLE musics (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     artist TEXT,
     album TEXT,
     genre TEXT,
-    duration TEXT,
-    uploadTime TEXT,
+    duration INTEGER,
+    uploadTime INTEGER NOT NULL,
     filePath TEXT NOT NULL
   )
 `);
@@ -33,7 +34,7 @@ db.exec(`
 export const insertMusic = (music: MusicInfo) => {
   const stmt = db.prepare(`
     INSERT OR REPLACE INTO musics (id, title, artist, album, genre, duration, uploadTime, filePath)
-    VALUES (@id, @title, @artist, @album, @genre, @duration, @uploadTime, @filePath)
+    VALUES (@id, @title, @artist, @album, @genre, @duration, CAST(@uploadTime AS INTEGER), @filePath)
   `);
   return stmt.run(music);
 };
