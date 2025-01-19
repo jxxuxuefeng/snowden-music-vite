@@ -97,7 +97,7 @@ function App() {
               </TableRow>
             )}
             {musics.map((music, index) => {
-              console.log(music, 'music');
+              // console.log(music, 'music');
               return (
                 <TableRow
                   onDoubleClick={async () => {

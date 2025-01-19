@@ -65,7 +65,7 @@ function Index(props: ComponentProps<'div'>) {
       setMetadata(currentMusic.metadata);
     };
     init();
-  }, [currentMusic]);
+  }, [currentMusic?.id]);
 
   // 监听音频播放时间和结束事件
   useEffect(() => {
