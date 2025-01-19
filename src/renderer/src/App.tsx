@@ -87,7 +87,7 @@ function App() {
             <TableHead>专辑</TableHead>
             <TableHead>格式</TableHead>
             <TableHead>大小</TableHead>
-            <TableHead>上传时间</TableHead>
+            <TableHead className="w-32">上传时间</TableHead>
           </TableHeader>
 
           <TableBody>
